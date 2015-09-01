@@ -1,5 +1,3 @@
-
-import java.math.BigInteger;
 /**
  * Created by xpf on 2015/8/31.
  */
@@ -19,13 +17,12 @@ public class SPN {
 
     public static void main(String[] args) {
         String k = "3a94d63f";
-        String t = "26b7";
+        String t = "26b72398456230458023849508923085093284509834257";
         String result = SPNAlg.realEncryption(t, k);
         System.out.println(result);
         result = SPNAlg.binaryToHexadecimal(result);
-        String res = SPNAlg.decrytion(result, k);
+        String res = SPNAlg.realDecryption(result, k);
         System.out.println(res);
     }
-
 
 }

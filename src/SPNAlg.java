@@ -94,6 +94,65 @@ public class SPNAlg {
 
     }
 
+    public static String realDecryption(String c, String k) {
+
+        String[] ts;
+        if (c.length() % 4 == 0) {
+            ts = new String[c.length() / 4];
+            if (c.length() > 4) {
+
+                int start = 0;
+                int initLength = 4;
+                for (int i = 0; i < c.length() / 4; i++) {
+                    if (initLength < c.length()) {
+                        ts[i] = c.substring(start, initLength);
+                        start = initLength;
+                        initLength = initLength + 4;
+                    } else {
+                        initLength = c.length();
+                        ts[i] = c.substring(start, initLength);
+                    }
+
+                }
+            } else {
+                ts = new String[]{c};
+            }
+        } else {
+            ts = new String[c.length() / 4 + 1];
+            if (c.length() > 4) {
+
+                int start = 0;
+                int initLength = 4;
+                for (int i = 0; i <= c.length() / 4; i++) {
+                    if (initLength < c.length()) {
+                        ts[i] = c.substring(start, initLength);
+                        start = initLength;
+                        initLength = initLength + 4;
+                    } else {
+                        initLength = c.length();
+                        ts[i] = c.substring(start, initLength);
+                        StringBuilder sb = new StringBuilder(ts[i]);
+
+                        for (int j = 0; j < 4 - ts[i].length(); j++) {
+                            sb.append(0);
+                        }
+                        ts[i] = sb.toString();
+                    }
+
+                }
+
+            } else {
+                ts = new String[]{c};
+            }
+
+        }
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < ts.length; i++) {
+            result.append(decryption(ts[i], k));
+        }
+        return result.toString();
+    }
+
     /**
      * Runs the encryption based on a key and a given plain-text.
      *
@@ -240,7 +299,7 @@ public class SPNAlg {
     } // END FUNCTION MAIN
 
 
-    public static String decrytion(String c, String k) {
+    public static String decryption(String c, String k) {
         /**
          * The key is the first argument.
          */
