@@ -17,10 +17,14 @@ public class SPN {
 
     public static void main(String[] args) {
         String k = "3a94d63f";
-        String t = "26b72398456230458023849508923085093284509834257";
+        String t = "26B7";
+
         String result = SPNAlg.realEncryption(t, k);
-        System.out.println(result);
+        System.out.println("Plain text is: " + t + "( Binary: " + SPNAlg.hexadecimalToBinary(SPNAlg.stringToStringArray(t)) + " )");
+        System.out.println("Cipher text is: " + SPNAlg.binaryToHexadecimal(result) + "( Binary: "
+                + result + " )");
         result = SPNAlg.binaryToHexadecimal(result);
+
         String res = SPNAlg.realDecryption(result, k);
         System.out.println(res);
     }
