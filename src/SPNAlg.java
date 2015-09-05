@@ -34,7 +34,7 @@ public class SPNAlg {
 
     public static String realEncryption(String t, String k) {
 
-
+        long startT = System.currentTimeMillis();
         String[] ts;
         if (t.length() % 4 == 0) {
             ts = new String[t.length() / 4];
@@ -89,13 +89,16 @@ public class SPNAlg {
         for (int i = 0; i < ts.length; i++) {
             result.append(encryption(ts[i], k));
         }
+        long end = System.currentTimeMillis();
+        long last = end - startT;
+        System.out.println("using time for encryption: " + last + "millis" + "\n");
         return result.toString();
 
 
     }
 
     public static String realDecryption(String c, String k) {
-
+        long startT = System.currentTimeMillis();
         String[] ts;
         if (c.length() % 4 == 0) {
             ts = new String[c.length() / 4];
@@ -150,6 +153,9 @@ public class SPNAlg {
         for (int i = 0; i < ts.length; i++) {
             result.append(decryption(ts[i], k));
         }
+        long end = System.currentTimeMillis();
+        long last = end - startT;
+        System.out.println("using time for decryption: " + last + "millis" + "\n");
         return result.toString();
     }
 
@@ -212,23 +218,10 @@ public class SPNAlg {
         // -------------------------------------------------------------------
         // PRINTS OUT INITIALIZATION
         // -------------------------------------------------------------------
-//        System.out.println("Initializing program with key <" + key
-//                + "> and plain-text <" + plainTextInput + ">\n");
-//
-//        for (String[] keyArray : keys) {
-//            System.out.print("Round " + currentRound + ": \tKey: "
-//                    + stringArrayToString(keyArray) + " \n\t\tBinary: ");
-//
-//            System.out.println(hexadecimalToBinary(keyArray));
-//            currentRound++;
-//        }
 
         // -------------------------------------------------------------------
         // PRINTS OUT PRE-ROUND WORK
         // -------------------------------------------------------------------
-//        System.out.println("\n>>> Beginning pre-round work with plain-text <"
-//                + stringArrayToString(plainText) + "> and key <"
-//                + stringArrayToString(firstRoundKey) + ">");
 
         String originalPlainTextInBinary = hexadecimalToBinary(plainText);
 
@@ -238,15 +231,6 @@ public class SPNAlg {
                 performXOR(originalPlainTextInBinary, key1InBinary);
 
         String originalResultInHex = binaryToHexadecimal(xorOriginalPTAndKey1);
-
-//        System.out.println("\t" + originalPlainTextInBinary + " ("
-//                + binaryToHexadecimal(originalPlainTextInBinary) + ")\nXOR\t"
-//                + key1InBinary + " (" + binaryToHexadecimal(key1InBinary) + ")");
-
-//        System.out.println("------------------------");
-
-//        System.out.println("\t" + xorOriginalPTAndKey1 + " = "
-//                + originalResultInHex);
 
         /**
          * Reset the current round to 1 so that we can print information about
@@ -264,37 +248,20 @@ public class SPNAlg {
         // -------------------------------------------------------------------
         // PRINTS OUT ROUND 4
         // -------------------------------------------------------------------
-//        System.out.println("\n>>> Beginning round " + currentRound
-//                + " with text <" + r3 + "> and key <"
-//                + stringArrayToString(keys[currentRound]) + ">");
 
         String resultAfterSBox = sBox(r3);
         String[] resultAfterSBoxAsArray = stringToStringArray(resultAfterSBox);
         String sBoxResultInBinary = hexadecimalToBinary(resultAfterSBoxAsArray);
 
-//        System.out.println("\nSbox:\t\t" + r3 + " --> " + resultAfterSBox
-//                + " = " + sBoxResultInBinary + "\n");
-//
-//        System.out.println("\t" + sBoxResultInBinary + " ("
-//                + binaryToHexadecimal(sBoxResultInBinary) + ")" + "\nXOR\t"
-//                + hexadecimalToBinary(keys[currentRound]) + " ("
-//                + stringArrayToString(keys[currentRound]) + ")");
-//
-//        System.out.println("------------------------");
 
         String xorSBoxAndRound =
                 performXOR(
                         sBoxResultInBinary,
                         hexadecimalToBinary(keys[currentRound]));
 
-//        System.out.println("\t" + xorSBoxAndRound + " = "
-//                + binaryToHexadecimal(xorSBoxAndRound));
-
         // -------------------------------------------------------------------
         // PRINTS OUT CIPHER TEXT
         // -------------------------------------------------------------------
-//        System.out.print("\n>>> Cipher text: " + xorSBoxAndRound + " ("
-//                + binaryToHexadecimal(xorSBoxAndRound) + ")");
         return xorSBoxAndRound;
     } // END FUNCTION MAIN
 
@@ -351,25 +318,10 @@ public class SPNAlg {
         // -------------------------------------------------------------------
         // PRINTS OUT INITIALIZATION
         // -------------------------------------------------------------------
-//        System.out.println("Initializing program with key <" + key
-//                + "> and plain-text <" + cypherTextInput + ">\n");
-
-//        for (String[] keyArray : keys) {
-//            System.out.print("Round " + deRound + ": \tKey: "
-//                    + stringArrayToString(keyArray) + " \n\t\tBinary: ");
-//
-//            System.out.println(hexadecimalToBinary(keyArray));
-//            deRound++;
-//        }
 
         // -------------------------------------------------------------------
         // PRINTS OUT PRE-ROUND WORK
         // -------------------------------------------------------------------
-
-//        System.out.println("\n>>> Beginning pre-round work with plain-text <"
-//                + stringArrayToString(cypherText) + "> and key <"
-//                + stringArrayToString(firstRoundKey) + ">");
-
 
         String originalCypherText = hexadecimalToBinary(cypherText);
 
@@ -388,16 +340,6 @@ public class SPNAlg {
 
         String w3 = performXOR(u4Hex, hexadecimalToBinary(fourthRoundKey));
 
-
-//        System.out.println("\t" + originalCypherText + " ("
-//                + binaryToHexadecimal(originalCypherText) + ")\nXOR\t"
-//                + key5InBinary + " (" + binaryToHexadecimal(key5InBinary) + ")");
-//
-//        System.out.println("------------------------");
-//
-//        System.out.println("\t" + v4 + " = "
-//                + v4Hex);
-
         /**
          * Reset the current round to 1 so that we can print information about
          * the rounds.
@@ -410,41 +352,6 @@ public class SPNAlg {
         String w2 = printRoundVerse(deRound, w3, keys);
         String w1 = printRoundVerse(deRound, w2, keys);
         String w0 = printRoundVerse(deRound, w1, keys);
-
-        // -------------------------------------------------------------------
-        // PRINTS OUT ROUND 4
-        // -------------------------------------------------------------------
-//        System.out.println("\n>>> Beginning round " + currentRound
-//                + " with text <" + w0 + "> and key <"
-//                + stringArrayToString(keys[currentRound]) + ">");
-//
-//        String resultAfterSBox = sBox(w0);
-//        String[] resultAfterSBoxAsArray = stringToStringArray(resultAfterSBox);
-//        String sBoxResultInBinary = hexadecimalToBinary(resultAfterSBoxAsArray);
-//
-//        System.out.println("\nSbox:\t\t" + w0 + " --> " + resultAfterSBox
-//                + " = " + sBoxResultInBinary + "\n");
-//
-//        System.out.println("\t" + sBoxResultInBinary + " ("
-//                + binaryToHexadecimal(sBoxResultInBinary) + ")" + "\nXOR\t"
-//                + hexadecimalToBinary(keys[currentRound]) + " ("
-//                + stringArrayToString(keys[currentRound]) + ")");
-//
-//        System.out.println("------------------------");
-//
-//        String xorSBoxAndRound =
-//                performXOR(
-//                        sBoxResultInBinary,
-//                        hexadecimalToBinary(keys[currentRound]));
-//
-//        System.out.println("\t" + xorSBoxAndRound + " = "
-//                + binaryToHexadecimal(xorSBoxAndRound));
-//
-//        // -------------------------------------------------------------------
-//        // PRINTS OUT CIPHER TEXT
-//        // -------------------------------------------------------------------
-//        System.out.print("\n>>> Cipher text: " + xorSBoxAndRound + " ("
-//                + binaryToHexadecimal(xorSBoxAndRound) + ")");
 
         return binaryToHexadecimal(w0);
     }
@@ -488,27 +395,7 @@ public class SPNAlg {
         // increments the current round by 1, and returns the resulting
         // hexadecimal for future rounds to use.
         // -------------------------------------------------------------------
-//        System.out.println("\n>>> Beginning round " + round + " with text <"
-//                + previousResultInHex + "> and key <"
-//                + stringArrayToString(keys[round]) + ">");
-//
-//        System.out.println("\nSbox:\t\t" + previousResultInHex + " --> "
-//                + resultAfterSBox + " = " + sBoxResultInBinary);
-//
-//        System.out.println("Permutation:\t" + sBoxResultInBinary + " --> "
-//                + sBoxBinaryPermutation + " = " + permutationInHex + "\n");
-//
-//        System.out.println("\t" + sBoxBinaryPermutation + " ("
-//                + binaryToHexadecimal(sBoxBinaryPermutation) + ")" + "\nXOR\t"
-//                + roundKey + " (" + binaryToHexadecimal(roundKey) + ")");
-//
-//        System.out.println("------------------------");
-//
-//        System.out.println("\t" + xorOfRound + " = "
-//                + binaryToHexadecimal(xorOfRound));
-
         currentRound++;
-
         return binaryToHexadecimal(xorOfRound);
     }
 
