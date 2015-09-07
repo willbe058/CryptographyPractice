@@ -7,7 +7,7 @@ import java.math.BigInteger;
 // -------------------------------------------------------------------------
 
 /**
- * This is an implementation of the SPN described in Section 3.2 of Stinson's
+ * This is an implementation of the Main described in Section 3.2 of Stinson's
  * cryptography text.
  * <p/>
  * Example input: <89AC36B5> <FE26>
@@ -17,13 +17,6 @@ import java.math.BigInteger;
  */
 public class SPNAlg {
     /**
-     * Error message that will be printed if the program has incorrect
-     * arguments.
-     */
-    static final String ERROR_MESSAGE =
-            "ERROR: Incorrect program usage.\nPlease use: SPN <key> <plain-text>";
-
-    /**
      * Defines what round the program is currently on.
      */
     static int currentRound = 0;
@@ -32,6 +25,8 @@ public class SPNAlg {
 
     // ----------------------------------------------------------
 
+
+    //split the string into short pieces of 16bits
     public static String realEncryption(String t, String k) {
 
         long startT = System.currentTimeMillis();
@@ -162,7 +157,7 @@ public class SPNAlg {
     /**
      * Runs the encryption based on a key and a given plain-text.
      *
-     * @param t arguments (containing the key and plain-text) 8bit
+     * @param t arguments (containing the key and plain-text) 16bit
      * @param k key 32bit
      */
     public static String encryption(String t, String k) {
@@ -332,7 +327,7 @@ public class SPNAlg {
 
         String v4Hex = binaryToHexadecimal(v4);
 
-        String u4 = sBoxVerse(v4Hex);
+        String u4 = sBoxInverse(v4Hex);
 
         String[] u4Array = stringToStringArray(u4);
 
@@ -407,7 +402,7 @@ public class SPNAlg {
 
         String vHex = binaryToHexadecimal(vBin);
 
-        String u = sBoxVerse(vHex);
+        String u = sBoxInverse(vHex);
 
         String[] uArray = stringToStringArray(u);
 
@@ -533,7 +528,7 @@ public class SPNAlg {
         return ret;
     }
 
-    public static String sBoxVerse(String hexadecimalString) {
+    public static String sBoxInverse(String hexadecimalString) {
         String ret = "";
 
         for (int i = 0; i < 4; i++) {

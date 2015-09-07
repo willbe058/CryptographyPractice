@@ -1,8 +1,6 @@
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.sql.Time;
 import java.util.Random;
-import java.util.Timer;
 
 /**
  * Created by xpf on 2015/9/4.
@@ -20,30 +18,37 @@ public class RSAAlg {
     private static BigInteger privateKey, publicKey, n;
 
     private int bitlen = 1024;
+    private static BigInteger p; // first prime
+    private static BigInteger q; // second prime
 
+    private static BigInteger d1, d2, d3, d4, c1, c2, m1, m2, y1, y2; // for fast decryption
+    BigInteger phi;
 
     public RSAAlg(int bitlen) {
-        BigInteger p = getProbPrime(bitlen);
-        BigInteger q = getProbPrime(bitlen);
-        BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
+
+        long a = System.currentTimeMillis();
+        p = getProbPrime(bitlen);
+        q = getProbPrime(bitlen);
+//        p = new BigInteger("1511");
+//        q = new BigInteger("2003");
+
+        BigInteger pm = p.subtract(BigInteger.ONE);
+        BigInteger qm = q.subtract(BigInteger.ONE);
+        phi = pm.multiply(qm);
         n = p.multiply(q);
         publicKey = new BigInteger("65537");
         privateKey = modInverse(publicKey, phi);
-//        System.out.println(p.isProbablePrime(1) + " " + q.isProbablePrime(1));
-//        System.out.println("\n private : " + privateKey + "\n" + publicKey.modInverse(phi));
-//        boolean isPrivate = privateKey.equals(publicKey.modInverse(phi));
-//        System.out.println("private same" + isPrivate);
-//        SecureRandom random = new SecureRandom();
-//        BigInteger p = new BigInteger(bitlen / 2, 100, random);
-//
-//        BigInteger q = new BigInteger(bitlen / 2, 100, random);
-//        n = p.multiply(q);
-//        BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
-//        publicKey = new BigInteger("65537");
-//        privateKey = publicKey.modInverse(phi);
-//        boolean isValid = publicKey.gcd(phi).equals(B_ONE);
+        d1 = privateKey.mod(pm);
+        d2 = privateKey.mod(qm);
 
-//        System.out.println(isValid);
+        d3 = publicKey.mod(pm);
+        d4 = publicKey.mod(qm);
+        c2 = modInverse(p, q);
+        System.out.println(d1 + "  " + d2);
+        long b = System.currentTimeMillis();
+        long c = b - a;
+        System.out.println("general RSA: " + c + "millis");
+
 
     }
 
@@ -55,6 +60,8 @@ public class RSAAlg {
         n = p.multiply(q);
         publicKey = new BigInteger("65537");
         privateKey = modInverse(publicKey, phi);
+
+
         long end = System.currentTimeMillis();
         long last = end - start;
         return "Public key is: " + "( " + n + ", " + publicKey + " ), "
@@ -63,20 +70,39 @@ public class RSAAlg {
     }
 
     public BigInteger encryption(BigInteger massage) {
-        return massage.modPow(publicKey, n);
+        return squareMultiply(massage, publicKey, n);
     }
 
     public BigInteger decryption(BigInteger encrypted) {
-        return encrypted.modPow(privateKey, n);
+        return squareMultiply(encrypted, privateKey, n);
     }
 
-//    public BigInteger encryption(String massage) {
-//        return massage.modPow(publicKey, n);
-//    }
+    public BigInteger encryptionCRT(BigInteger plain) {
+        BigInteger r1 = squareMultiply(plain, d3, p);
+        BigInteger r2 = squareMultiply(plain, d4, q);
 
-//    public BigInteger decryption(String encrypted) {
-//        return encrypted.modPow(privateKey, n);
-//    }
+        BigInteger u = ((r2.subtract(r1)).multiply(c2)).remainder(q);
+        if (u.compareTo(BigInteger.ZERO) < 0) u = u.add(q);
+        return r1.add(u.multiply(p));
+    }
+
+    public BigInteger decryptionCRT(BigInteger en) {
+        BigInteger r1 = squareMultiply(en, d1, p);
+        BigInteger r2 = squareMultiply(en, d2, q);
+
+        BigInteger u = ((r2.subtract(r1)).multiply(c2)).remainder(q);
+        if (u.compareTo(BigInteger.ZERO) < 0) u = u.add(q);
+        return r1.add(u.multiply(p));
+
+    }
+
+    public String encryption(String massage) {
+        return squareMultiply(new BigInteger(massage.getBytes()), publicKey, n).toString();
+    }
+
+    public String decryption(String encrypted) {
+        return new String(squareMultiply(new BigInteger(encrypted), privateKey, n).toByteArray());
+    }
 
 
     /**
@@ -154,9 +180,22 @@ public class RSAAlg {
         do {
             p = new BigInteger(bit / 2, new SecureRandom());
 
-        } while (!p.isProbablePrime(2));
+        } while (!isPrimeMillerRabin(p, 2));
         return p;
 
+    }
+
+    public static BigInteger squareMultiply(BigInteger x, BigInteger c, BigInteger n) {
+        BigInteger z = new BigInteger("1");
+        String cBin = new BigInteger(String.valueOf(c)).toString(2);
+        for (int i = cBin.length() - 1; i >= 0; i--) {
+            z = (z.multiply(z)).mod(n);
+            if ((cBin.charAt(cBin.length() - 1 - i)) == '1') {
+                z = (z.multiply(x)).mod(n);
+
+            }
+        }
+        return z;
     }
 
 
